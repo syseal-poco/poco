@@ -51,16 +51,22 @@ podman run --rm -v ./:/project  poco/build-deb
 
 ```bash
 #Send package to host
-scp ./output/poco-0.8.0.deb <server>:/tmp/
+scp ./output/poco-0.8.x.deb <server>:/tmp/
 #Login to the host
 ssh <server>
+```
+
+or
+
+```bash
+wget https://github.com/syseal-poco/poco/releases/download/0.8.x/poco-0.8.x.deb
 ```
 
 ### Debian Installation
 
 ```bash
 #Install with dpkg
-sudo dpkg -i /tmp/poco-0.8.0.deb
+sudo dpkg -i /tmp/poco-0.8.x.deb
 #if missing package, do this command
 sudo apt install -f
 #Configure poco

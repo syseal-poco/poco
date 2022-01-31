@@ -249,6 +249,8 @@ ln -vfs /opt/poco/poco.sh "${PACKAGE_PATH}"/usr/local/bin/poco
 chmod 600 "${PACKAGE_PATH}"/etc/poco.conf
 chmod 600 "${PACKAGE_PATH}"/etc/sysctl.d/20-poco-sysctl.conf
 chmod -R u=rwX,g-rwx,o-rwx "${PACKAGE_PATH}"/opt/poco
+chmod u=rwX,g=rx,o=rx "${PACKAGE_PATH}"/opt/poco
+chmod u=rwX,g=rx,o=rx "${PACKAGE_PATH}"/opt/poco/poco.sh
 
 ########################################
 #Update version in script file when user want know version

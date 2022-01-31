@@ -98,6 +98,10 @@ if [[ "${EUID}" -ne 0 ]]; then
   fi
 fi
 
+#Warning: mandatory 'cd'.  Use "CPTH" to get relative path from arguments
+#Bug: Loginctl will not work if launched from a directory with not enough permission like 700.
+cd "${SPTH:?}"
+
 #Load function library
 set -a
 # shellcheck source=./src/lib/bash_utils.sh
