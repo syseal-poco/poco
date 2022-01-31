@@ -1,0 +1,17 @@
+# Look for 'source'd files relative to the checked script.
+source-path=./src/lib
+#source-path=
+#external-sources=true
+
+# Turn on warnings for unquoted variables with safe values
+#enable=quote-safe-variables
+
+# Turn on warnings for unassigned uppercase variables
+#enable=check-unassigned-uppercase
+
+# Allow variable '${var}' in simple quote without warning
+disable=SC2016
+
+# Directive
+enable=require-variable-braces
+enable=require-double-brackets

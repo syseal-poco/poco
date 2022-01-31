@@ -1,0 +1,8 @@
+#vscode
+settings.json
+
+#untracked folder
+trash/
+tmp/
+output/
+build/

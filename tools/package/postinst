@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Post installation script"
+
+#Update sysctl configuration
+sysctl --system
+
+#Enable Service
+systemctl enable poco-boot.service

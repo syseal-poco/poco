@@ -1,0 +1,9 @@
+Package: poco
+Version: ${GIT_VERSION_SHORT}
+Maintainer: carbon SEVERAC <carbon.severac@tuta.io>
+Description: Poco (Podman configuration helper) is as utility shell to manage rootless services on a small server or a NAS with high customizability scripts.
+Homepage: None
+Architecture: all
+Depends: systemd, coreutils, openssl, apache2-utils, pwgen, gettext-base, util-linux, sed, gawk, findutils, nano, iproute2, bsdextrautils,
+    passwd, git, wget | curl, dbus-user-session, crun, conmon, slirp4netns, fuse-overlayfs, containernetworking-plugins,
+    golang-github-containers-common, golang-github-containernetworking-plugin-dnsname

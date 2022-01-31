@@ -1,0 +1,58 @@
+###############################
+############ROUTERS############
+###############################
+[http.routers]
+  [http.routers.${SERVICE}]
+    entryPoints = ["admin"]
+    rule = "Host(`${CFG_HOST}`)"
+    service = "api@internal"
+    # [http.routers.traefik.tls]
+
+###############################
+##########MIDDLEWARES##########
+###############################
+
+[http.middlewares]
+  [http.middlewares.ratelimit.rateLimit]
+    average = 80
+    burst = 40
+
+  [http.middlewares.auth.basicAuth]
+  users = [
+    "${CFG_ADMIN_PWD_HASH}",
+  ]
+
+  # [http.middlewares.redirectscheme.redirectScheme]
+  #   scheme = "https"
+  #   port="9443"
+  #   permanent = true
+
+  [http.middlewares.whitelist.ipWhiteList]
+    sourceRange = ["127.0.0.1/24", "${CFG_WHITELIST}" ]
+
+
+  # Limiting simultaneous connections
+  [http.middlewares.limitinflightreq.inFlightReq]
+    amount = 30
+
+###############################
+##########   TLS   ############
+###############################
+[tls.options]
+  [tls.options.customtls]
+    minVersion = "VersionTLS13"
+    cipherSuites = [
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_AES_128_GCM_SHA256",
+      "TLS_AES_256_GCM_SHA384",
+    ]
+
+[tls.stores]
+  [tls.stores.default]
+    [tls.stores.default.defaultCertificate]
+      certFile = "/etc/traefik/tls/default.crt"
+      keyFile  = "/etc/traefik/tls/default.key"

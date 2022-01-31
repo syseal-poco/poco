@@ -1,0 +1,15 @@
+[Unit]
+Description=Poco boot event trigger
+After=systemd-user-sessions.service
+Before=getty.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+User=root
+WorkingDirectory=/opt
+ExecStart=/usr/local/bin/poco --type boot -f event all
+TimeoutStartSec=5min
+
+[Install]
+WantedBy=multi-user.target

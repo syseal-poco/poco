@@ -1,0 +1,297 @@
+################################################################
+#
+# Configuration sample for Traefik v2.
+#
+################################################################
+
+################################################################
+# Global configuration
+################################################################
+[global]
+  checkNewVersion = true
+  sendAnonymousUsage = false
+
+################################################################
+# Entrypoints configuration (Warning: Can only be in this file Static Configurations)
+################################################################
+
+###############################
+######### Services ############
+###############################
+[entryPoints]
+  [entryPoints.web]
+    address = "${CFG_ENTRYPOINT_HTTP}"
+
+  [entryPoints.web.http]
+    [entryPoints.web.http.redirections]
+      [entryPoints.web.http.redirections.entryPoint]
+        to = "websecure"
+        scheme = "https"
+        permanent = true
+
+  [entryPoints.websecure]
+    address = "${CFG_ENTRYPOINT_HTTPS}"
+
+    [entryPoints.websecure.http]
+      middlewares = ["ratelimit@file", "limitinflightreq@file" ]
+
+###############################
+##### Admin dashboards ########
+###############################
+  [entryPoints.admin]
+    address = "${CFG_ENTRYPOINT_ADMIN}"
+
+    [entryPoints.admin.http]
+      middlewares = [ "whitelist@file", "auth@file", "ratelimit@file" ] #"redirectscheme"
+
+      [entryPoints.admin.http.tls]
+        options = "customtls@file" # Default tls option for all routers using this entrypoint
+
+###############################
+##### CUSTOM ENTRYPOINTS ######
+###############################
+
+
+
+################################################################
+# Traefik logs configuration
+################################################################
+
+# Traefik logs
+# Enabled by default and log to stdout
+#
+# Optional
+#
+[log]
+
+  # Log level
+  #
+  # Optional
+  # Default: "ERROR"
+  #
+  # level = "DEBUG"
+
+  # Sets the filepath for the traefik log. If not specified, stdout will be used.
+  # Intermediate directories are created if necessary.
+  #
+  # Optional
+  # Default: os.Stdout
+  #
+  # filePath = "log/traefik.log"
+
+  # Format is either "json" or "common".
+  #
+  # Optional
+  # Default: "common"
+  #
+  # format = "json"
+
+################################################################
+# Access logs configuration
+################################################################
+
+# Enable access logs
+# By default it will write to stdout and produce logs in the textual
+# Common Log Format (CLF), extended with additional fields.
+#
+# Optional
+#
+# [accessLog]
+
+  # Sets the file path for the access log. If not specified, stdout will be used.
+  # Intermediate directories are created if necessary.
+  #
+  # Optional
+  # Default: os.Stdout
+  #
+  # filePath = "/path/to/log/log.txt"
+
+  # Format is either "json" or "common".
+  #
+  # Optional
+  # Default: "common"
+  #
+  # format = "json"
+
+################################################################
+# API and dashboard configuration
+################################################################
+
+# Enable API and dashboard
+[api]
+
+  # Enable the API in insecure mode
+  #
+  # Optional
+  # Default: false
+  #
+  insecure = false
+
+  # Enabled Dashboard
+  #
+  # Optional
+  # Default: true
+  #
+  dashboard = true
+
+
+[pilot]
+  # Token = "foobar"
+  dashboard = false
+
+################################################################
+# Ping configuration
+################################################################
+
+# Enable ping
+#[ping]
+
+  # Name of the related entry point
+  #
+  # Optional
+  # Default: "traefik"
+  #
+  # entryPoint = "traefik"
+
+
+################################################################
+# Providers  configuration backend
+################################################################
+[providers]
+  #Configuration reload frequency
+  #providers.providersThrottleDuration = 10s
+
+################################################################
+# Docker configuration backend
+################################################################
+
+# Enable Docker configuration backend
+# [providers.docker]
+
+#   # Docker server endpoint. Can be a tcp or a unix socket endpoint.
+#   #
+#   # Required
+#   # Default: "unix:///var/run/docker.sock"
+#   #
+#   endpoint = "unix:///var/run/docker.sock"
+
+#   # Default host rule.
+#   #
+#   # Optional
+#   # Default: "Host(`{{ normalize .Name }}`)"
+#   #
+#   # defaultRule = "Host(`{{ normalize .Name }}.docker.localhost`)"
+
+#   # Expose containers by default in traefik
+#   #
+#   # Optional
+#   # Default: true
+#   #
+#   exposedByDefault = false
+
+#   swarmMode = false # Activates the Swarm Mode (instead of standalone Docker).
+#   swarmModeRefreshSeconds = 15 #Defines the polling interval (in seconds) in Swarm Mode. Default is 15
+#   watch = true # Watch Docker Swarm events.
+#   network = "net_admin" #docker network for traefik scan redirection
+
+#   # [providers.docker.tls]
+#   #   ca = "foobar"
+#   #   caOptional = true
+#   #   cert = "/etc/traefik/tls/custom.crt"
+#   #   key = "/etc/traefik/tls/custom.key"
+#   #   insecureSkipVerify = tru
+
+
+#will look config folder
+  [providers.file]
+    directory = "/etc/traefik/configs.d/"
+    watch = true
+
+################################################################
+# Certificat configuration  (Warning: Can only be in this file Static Configurations)
+################################################################
+
+[certificatesResolvers]
+  [certificatesResolvers.prod]
+    [certificatesResolvers.prod.acme]
+
+      email = "${CFG_EMAIL_TLS}"
+      storage = "/etc/traefik/acme/prod.json"
+      keyType = "RSA4096"
+
+      [certificatesResolvers.prod.acme.tlsChallenge]
+      [certificatesResolvers.prod.acme.dnsChallenge]
+      [certificatesResolvers.prod.acme.httpChallenge]
+        entryPoint = "websecure"
+
+    [certificatesResolvers.test.acme]
+
+      email = "${CFG_EMAIL_TLS}"
+      storage = "/etc/traefik/acme/test.json"
+      caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+      keyType = "RSA4096"
+
+      [certificatesResolvers.test.acme.tlsChallenge]
+      [certificatesResolvers.test.acme.dnsChallenge]
+      [certificatesResolvers.test.acme.httpChallenge]
+        entryPoint = "websecure"
+
+################################################################
+# Tracing configuration
+################################################################
+# Tracing definition
+# [tracing]
+#   # Backend name used to send tracing data
+#   #
+#   # Default: "jaeger"
+#   #
+#   backend = "jaeger"
+
+#   # Service name used in Jaeger backend
+#   #
+#   # Default: "traefik"
+#   #
+#   serviceName = "traefik"
+
+#   # Span name limit allows for name truncation in case of very long Frontend/Backend names
+#   # This can prevent certain tracing providers to drop traces that exceed their length limits
+#   #
+#   # Default: 0 - no truncation will occur
+#   #
+#   spanNameLimit = 0
+
+#   [tracing.jaeger]
+#     # Sampling Server URL is the address of jaeger-agent's HTTP sampling server
+#     #
+#     # Default: "http://localhost:5778/sampling"
+#     #
+#     samplingServerURL = "http://localhost:5778/sampling"
+
+#     # Sampling Type specifies the type of the sampler: const, probabilistic, rateLimiting
+#     #
+#     # Default: "const"
+#     #
+#     samplingType = "const"
+
+#     # Sampling Param is a value passed to the sampler.
+#     # Valid values for Param field are:
+#     #   - for "const" sampler, 0 or 1 for always false/true respectively
+#     #   - for "probabilistic" sampler, a probability between 0 and 1
+#     #   - for "rateLimiting" sampler, the number of spans per second
+#     #
+#     # Default: 1.0
+#     #
+#     samplingParam = 1.0
+
+#     # Local Agent Host Port instructs reporter to send spans to jaeger-agent at this address
+#     #
+#     # Default: "127.0.0.1:6831"
+#     #
+#     localAgentHostPort = "127.0.0.1:6831"
+
+#     # Trace Context Header Name is the http header name used to propagate tracing context.
+#     # This must be in lower-case to avoid mismatches when decoding incoming headers.
+#     #
+#     # Default: "uber-trace-id"
+#     #
+#     traceContextHeaderName = "uber-trace-id"

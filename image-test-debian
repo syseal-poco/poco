@@ -1,0 +1,44 @@
+#Container File to test poco application.
+FROM debian:11
+LABEL description "Poco testing image for debian" \
+    maintainer="carbon severac <carbon.severac@tuta.io>"
+
+COPY tests/sources.list /etc/apt/sources.list
+
+#Update the image to the latest packages
+RUN apt update && apt upgrade -y
+
+#Install podman dependancy
+RUN apt install -y make btrfs-progs git golang-go go-md2man \
+    iptables libassuan-dev libbtrfs-dev libc6-dev libdevmapper-dev libglib2.0-dev \
+    libgpgme-dev libgpg-error-dev libprotobuf-dev libprotobuf-c-dev libseccomp-dev \
+    libselinux1-dev libsystemd-dev pkg-config runc uidmap
+
+#Build podman
+ARG PODMAN_VERSION=3.4.4
+COPY tools/build-podman.sh /tmp
+RUN bash /tmp/build-podman.sh /tmp v${PODMAN_VERSION}
+
+#Install system podman dependancy (and rootless) (buildah ?)
+RUN apt install -y dbus-user-session crun conmon slirp4netns fuse-overlayfs \
+    containernetworking-plugins golang-github-containers-common golang-github-containernetworking-plugin-dnsname
+
+#Install poco dependancy
+RUN apt install -y apache2-utils util-linux sed gawk pwgen procps nano dpkg iproute2 gettext-base bsdextrautils openssl \
+    git curl wget
+
+#Install debian utility and systemd prerequiste
+RUN apt install -y systemd systemd-sysv sudo man tree htop
+
+#Install drivers for tests containers.
+RUN apt install -y mesa-va-drivers firmware-linux firmware-linux-nonfree libdrm-amdgpu1 intel-media-va-driver-non-free
+
+#Add volume for install poco
+VOLUME /output
+WORKDIR /output
+
+#Expose services main port
+EXPOSE 80 443
+
+#Launch systemd when container start
+CMD [ "/bin/systemd", "--system", "--unit=basic.target" ]

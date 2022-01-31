@@ -1,0 +1,38 @@
+#Container File to test poco application.
+FROM fedora:35
+LABEL description "Poco testing image for fedora" \
+    maintainer="carbon severac <carbon.severac@tuta.io>"
+
+#Update the image to the latest packages
+RUN yum update -y && yum upgrade -y
+
+#Install podman dependancy
+RUN yum install -y btrfs-progs-devel conmon containernetworking-plugins containers-common \
+    crun device-mapper-devel git glib2-devel glibc-devel glibc-static go golang-github-cpuguy83-md2man \
+    gpgme-devel iptables libassuan-devel libgpg-error-devel libseccomp-devel libselinux-devel make \
+    pkgconfig
+
+#Build podman
+ARG PODMAN_VERSION=3.4.4
+COPY tools/build-podman.sh /tmp
+RUN bash /tmp/build-podman.sh /var/tmp v${PODMAN_VERSION}
+
+#Install poco dependancy for fedora
+RUN yum install -y procps-ng hostname httpd-tools util-linux sed gawk pwgen procps nano util-linux passwd \
+    iproute gettext openssl git curl wget
+
+# #Install debian utility and systemd prerequiste
+RUN yum install -y systemd systemd-sysv sudo man tree htop
+
+#Install drivers for tests containers.
+RUN yum install -y mesa-dri-drivers libva-intel-hybrid-driver xorg-x11-drv-amdgpu
+
+#Add volume for install poco
+VOLUME /output
+WORKDIR /output
+
+#Expose services main port
+EXPOSE 80 443
+
+#Launch systemd when container start
+CMD [ "/lib/systemd/systemd", "--system", "--unit=basic.target" ]

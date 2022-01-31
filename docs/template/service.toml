@@ -1,0 +1,22 @@
+###############################
+############ROUTERS############
+###############################
+[http.routers]
+  [http.routers.${SERVICE}]
+    entryPoints = ["websecure"]
+    rule = "Host(`${CFG_HOST}`)"
+    service = "${SERVICE}"
+    [http.routers.${SERVICE}.tls]
+      certResolver = "prod"
+
+###############################
+###########SERVICES############
+###############################
+[http.services]
+  [http.services.${SERVICE}.loadBalancer]
+    [[http.services.${SERVICE}.loadBalancer.servers]]
+      url = "http://localhost:${CFG_PORT}/"
+
+###############################
+##########MIDDLEWARES##########
+###############################
