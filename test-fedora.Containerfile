@@ -27,6 +27,9 @@ RUN yum install -y systemd systemd-sysv sudo man tree htop
 #Install drivers for tests containers.
 RUN yum install -y mesa-dri-drivers libva-intel-hybrid-driver xorg-x11-drv-amdgpu
 
+#Create "test" user with password "test"
+RUN useradd -m -s /bin/bash -G sudo -p salSp1wOPp6fk test
+
 #Add volume for install poco
 VOLUME /output
 WORKDIR /output
