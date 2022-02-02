@@ -33,6 +33,9 @@ RUN apt install -y systemd systemd-sysv sudo man tree htop
 #Install drivers for tests containers.
 RUN apt install -y mesa-va-drivers firmware-linux firmware-linux-nonfree libdrm-amdgpu1 intel-media-va-driver-non-free
 
+#Create "test" user with password "test"
+RUN useradd -m -s /bin/bash -G sudo -p salSp1wOPp6fk test
+
 #Add volume for install poco
 VOLUME /output
 WORKDIR /output

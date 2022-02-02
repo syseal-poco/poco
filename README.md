@@ -32,7 +32,7 @@ __Service__:
 - Build package on debian/ubuntu
 
 ```bash
-cd <workspace>
+cd <project workspace>
 apt install -y dpkg git alien rsync pandoc
 ./tools/build-package.sh ./output ./
 ```
@@ -40,9 +40,9 @@ apt install -y dpkg git alien rsync pandoc
 - Build package with docker or podman
 
 ```bash
-cd <workspace>
+cd <project workspace>
 #Build local image (Note: do it once)
-podman build -f image-build --tag=poco/build-deb .
+podman build -f build.Containerfile --tag=poco/build-deb .
 #Run the container to build package
 podman run --rm -v ./:/project  poco/build-deb
 ```
@@ -89,7 +89,7 @@ poco setup
 ### Create podman container to test poco
 
 ```bash
-cd <workspace>
+cd <project workspace>
 #Create network
 sudo podman network create --subnet 10.50.50.0/24 -d bridge poco-network 
 ```
@@ -98,22 +98,22 @@ sudo podman network create --subnet 10.50.50.0/24 -d bridge poco-network
 
 ```bash
 #Build local image (Note: do it once)
-sudo podman build -f image-test-debian --tag=poco/test/debian ./
+sudo podman build -f test-debian.Containerfile --tag=poco/test/debian ./
 #Run the container to test poco
 sudo podman run -d -v ./output:/output --privileged --network poco-network --ip 10.50.50.10 --name=poco-debian --hostname=nas.lan poco/test/debian
 #Login into the container
-sudo podman exec -it poco-debian bash
+sudo podman exec -u=test -it poco-debian bash
 ```
 
 #### Fedora Test
 
 ```bash
 #Build local image (Note: do it once)
-sudo podman build -f image-test-fedora --tag=poco/test/fedora ./
+sudo podman build -f test-fedora.Containerfile --tag=poco/test/fedora ./
 #Run the container to test poco
 sudo podman run -d -v ./output:/output --privileged --network poco-network --ip 10.50.50.20 --name=poco-fedora --hostname=nas.lan poco/test/fedora
 #Login into the container
-sudo podman exec -it poco-fedora bash
+sudo podman exec -u=test -it poco-fedora bash
 ```
 
 ## History
